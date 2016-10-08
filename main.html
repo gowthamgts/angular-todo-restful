@@ -1,5 +1,6 @@
-<div class="">
-  <p>
-    Hello World
-  </p>
+<div class="main" ng-controller="todoCtrl">
+  <h3>Todo Lists:</h3>
+  <ul>
+    <li ng-repeat="todo in todoLists">{{todo}}</li>
+  </ul>
 </div>
