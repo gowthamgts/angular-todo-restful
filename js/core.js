@@ -2,7 +2,6 @@ var CONSTS = {
   "api": "http://localhost:3000"
 }
 
-// Toastr config
 toastr.options = {
   "closeButton": false,
   "newestOnTop": false,
@@ -30,13 +29,13 @@ todoApp.config(function($routeProvider){
     templateUrl: "signup.html"
   })
   .when("/index", {
-    templateUrl: "main.html"
+    templateUrl: "_main.html"
   })
   .when("/logout", {
     templateUrl: "logout.html"
   })
   .otherwise({
-    templateUrl: "main.html"
+    templateUrl: "_main.html"
   })
 })
 
@@ -81,23 +80,32 @@ todoApp.controller('signupCtrl', function($scope, $auth) {
   };
 });
 
-todoApp.controller('todoCtrl', function($scope, $http, $rootScope, $auth) {
-  $http.get(CONSTS.api + '/')
-  .then(function(response) {
-    if (angular.isArray(response.data)) {
-      $scope.todoLists = response.data;
-    } else {
-      toastr.error("Oops! Cannot get the TodoLists!");
-    }
-  });
+todoApp.controller('todoCtrl', function($scope, $http, $auth, $location, $rootScope) {
+  if ($rootScope.isLoggedIn) {
+    $http.get(CONSTS.api + '/')
+    .then(function(response) {
+      if (angular.isArray(response.data)) {
+        $scope.todoLists = response.data;
+      } else {
+        toastr.error("Oops! Cannot get the TodoLists!");
+      }
+    }, function(response) {
+      if (response.status == 401) {
+        $location.path('/login')
+      }
+    });
+  } else {
+    $location.path('/login')
+  }
 });
 
-todoApp.controller('logoutCtrl', function($auth) {
+todoApp.controller('logoutCtrl', function($auth, $rootScope) {
   $auth.signOut()
   .then(function(resp) {
     if (resp.status == 200) {
       toastr.success("Successullly logged out!");
     }
+    $rootScope.isLoggedIn = false;
   })
   .catch(function(resp) {
     toastr.error("Oops! " + resp.data.errors.full_messages.join('<br/>'));
