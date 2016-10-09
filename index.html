@@ -9,6 +9,7 @@
     <script src="/deps/angular-route/angular-route.min.js" charset="utf-8"></script>
     <script src="/deps/ng-token-auth/dist/ng-token-auth.js" charset="utf-8"></script>
     <script src="/deps/angular-cookie/angular-cookie.min.js" charset="utf-8"></script>
+    <script src="/deps/angular-resource/angular-resource.min.js" charset="utf-8"></script>
     <script src="/deps/jquery/dist/jquery.min.js" charset="utf-8"></script>
     <script src="/deps/toastr/toastr.js" charset="utf-8"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -18,14 +19,23 @@
     <link rel="stylesheet" href="/deps/toastr/toastr.css" media="screen" charset="utf-8">
   </head>
   <body ng-app="todoApp">
-    <div class="jumbotron">
-      <h1 class="text-center">A RESTful TODO app.</h1>
-    </div>
+    <nav class="navbar navbar-default">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">A RESTful TODO app.</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="#">Home</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="/#/login">Login</a></li>
+          <li><a href="/#/signup">Register</a></li>
+        </ul>
+      </div>
+    </nav>
     <div class='container'>
       <div class="row">
-        <div class="col-md-3"></div>
-        <div class="col-md-6" ng-view></div>
-        <div class="col-md-3"></div>
+        <div class="col-md-6 col-md-offset-3" ng-view></div>
       </div>
     </div>
     <script src="/js/core.js" charset="utf-8"></script>

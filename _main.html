@@ -1,6 +1,31 @@
 <div class="main" ng-controller="todoCtrl">
-  <h3>Todo Lists:</h3>
-  <ul>
-    <li ng-repeat="todo in todoLists">{{todo}}</li>
-  </ul>
+  <h3>Your Todo List:</h3>
+  <form ng-submit="addTodo(todoItem)" role="form">
+    <div class="row">
+      <div class="form-group col-md-9">
+        <input type="text" name="todoItem" ng-model="todoItem.name" required="required" class="form-control" autocomplete="off" />
+      </div>
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-primary">Add</button>
+      </div>
+    </div>
+  </form>
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
+      <ul class="list-unstyled">
+        <li class="ui-state-default" ng-repeat="todo in todoLists">
+          <div class="checkbox">
+            <label>
+              <div ng-if="todo.completed == true">
+                <input type="checkbox" value="{{todo.name}}" ng-click="toggleCompletion(todo)" checked="checked"><s>{{todo.name}}</s><a href="#" class="close" aria-hidden="true" ng-click="removeTodo(todo)">×</a>
+              </div>
+              <div ng-if="todo.completed == false">
+                <input type="checkbox" value="{{todo.name}}" ng-click="toggleCompletion(todo)">{{todo.name}}<a href="#" class="close" aria-hidden="true" ng-click="removeTodo(todo)">×</a>
+              </div>
+            </label>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
 </div>

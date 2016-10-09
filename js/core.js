@@ -1,11 +1,14 @@
 var CONSTS = {
-  "api": "http://localhost:3000"
+  api: "http://localhost:3000",
+  sessionExpiryMessage: "Your session was expired. Please login again!"
 }
+
+var debugmode = true;
 
 toastr.options = {
   "closeButton": false,
   "newestOnTop": false,
-  "progressBar": true,
+  "progressBar": false,
   "positionClass": "toast-top-right",
   "preventDuplicates": false,
   "onclick": null,
@@ -19,7 +22,7 @@ toastr.options = {
   "hideMethod": "fadeOut"
 }
 
-var todoApp = angular.module("todoApp", ['ngRoute', 'ng-token-auth', 'ipCookie']);
+var todoApp = angular.module("todoApp", ['ngRoute', 'ng-token-auth', 'ipCookie', 'ngResource']);
 todoApp.config(function($routeProvider){
   $routeProvider
   .when("/login", {
@@ -46,7 +49,18 @@ todoApp.config(function($authProvider){
   });
 });
 
+angular.module('todoApp').factory('TodoItem', function($resource) {
+  return $resource(CONSTS.api + '/todos/:id', { id: '@id' }, {
+      update: {
+        method: 'PUT'
+      }
+    });
+});
+
 todoApp.controller('loginCtrl', function($scope, $rootScope, $auth, $location){
+  $scope.navigateToSignup = function() {
+    $location.path('/signup');
+  };
   $scope.submitLogin = function(){
     $auth.submitLogin($scope.loginForm)
     .then(function(resp) {
@@ -60,13 +74,14 @@ todoApp.controller('loginCtrl', function($scope, $rootScope, $auth, $location){
   };
 
   $rootScope.$on('auth:login-success', function(ev, user) {
-      $rootScope.user = user;
-      $rootScope.isLoggedIn = true;
       $location.path('/index')
   });
 });
 
-todoApp.controller('signupCtrl', function($scope, $auth) {
+todoApp.controller('signupCtrl', function($scope, $auth, $location) {
+  $scope.navigateToLogin = function() {
+    $location.path('/login');
+  };
   $scope.submitRegistration = function() {
     $auth.submitRegistration($scope.registrationForm)
     .then(function(resp) {
@@ -80,22 +95,48 @@ todoApp.controller('signupCtrl', function($scope, $auth) {
   };
 });
 
-todoApp.controller('todoCtrl', function($scope, $http, $auth, $location, $rootScope) {
-  if ($rootScope.isLoggedIn) {
-    $http.get(CONSTS.api + '/')
-    .then(function(response) {
-      if (angular.isArray(response.data)) {
-        $scope.todoLists = response.data;
-      } else {
-        toastr.error("Oops! Cannot get the TodoLists!");
-      }
-    }, function(response) {
-      if (response.status == 401) {
-        $location.path('/login')
-      }
-    });
-  } else {
-    $location.path('/login')
+todoApp.controller('todoCtrl', function($scope, $http, $auth, $location, $rootScope, $resource, TodoItem) {
+  if (debugmode) {
+    console.log($auth.retrieveData('auth_headers'));
+  }
+  if ($auth.retrieveData('auth_headers') == null) {
+    toastr.error(CONSTS.sessionExpiryMessage);
+    $location.path('/login');
+  }
+
+  $scope.todoLists = TodoItem.query();
+
+  $scope.addTodo = function(todoItem) {
+    if (todoItem) {
+      newItem = new TodoItem();
+      newItem.name = todoItem.name;
+      newItem.completed = false;
+      TodoItem.save(newItem, function() {
+        $scope.todoLists.push(newItem);
+      });
+      $scope.todoItem = "";
+    }
+  }
+
+  $scope.toggleCompletion = function(todoItem) {
+    updateItem = new TodoItem();
+    updateItem = todoItem;
+    if (todoItem.completed) {
+      updateItem.completed = false;
+    } else {
+      updateItem.completed = true;
+    }
+    updateItem.$update();
+  }
+
+  $scope.removeTodo = function(todoItem) {
+    var index = $scope.todoLists.indexOf(todoItem);
+    if (index >= 0) {
+      $scope.todoLists.splice(index, 1);
+      removeItem = new TodoItem();
+      removeItem = todoItem;
+      removeItem.$delete();
+    }
   }
 });
 
@@ -105,7 +146,6 @@ todoApp.controller('logoutCtrl', function($auth, $rootScope) {
     if (resp.status == 200) {
       toastr.success("Successullly logged out!");
     }
-    $rootScope.isLoggedIn = false;
   })
   .catch(function(resp) {
     toastr.error("Oops! " + resp.data.errors.full_messages.join('<br/>'));
