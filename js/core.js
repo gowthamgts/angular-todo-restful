@@ -66,6 +66,8 @@ todoApp.controller('loginCtrl', function($scope, $rootScope, $auth, $location){
     .then(function(resp) {
       if (resp.uid != undefined && resp.signedIn == true) {
         toastr.success("Successfully logged in!");
+        $("#publicNav").hide();
+        $("#userNav").show();
       }
     })
     .catch(function(resp) {
@@ -99,6 +101,7 @@ todoApp.controller('todoCtrl', function($scope, $http, $auth, $location, $rootSc
   if (debugmode) {
     console.log($auth.retrieveData('auth_headers'));
   }
+  
   if ($auth.retrieveData('auth_headers') == null) {
     toastr.error(CONSTS.sessionExpiryMessage);
     $location.path('/login');
@@ -111,9 +114,7 @@ todoApp.controller('todoCtrl', function($scope, $http, $auth, $location, $rootSc
       newItem = new TodoItem();
       newItem.name = todoItem.name;
       newItem.completed = false;
-      TodoItem.save(newItem, function() {
-        $scope.todoLists.push(newItem);
-      });
+      $scope.todoLists.push(TodoItem.save(newItem));
       $scope.todoItem = "";
     }
   }
@@ -140,14 +141,14 @@ todoApp.controller('todoCtrl', function($scope, $http, $auth, $location, $rootSc
   }
 });
 
-todoApp.controller('logoutCtrl', function($auth, $rootScope) {
+todoApp.controller('logoutCtrl', function($auth, $rootScope, $location) {
   $auth.signOut()
   .then(function(resp) {
     if (resp.status == 200) {
       toastr.success("Successullly logged out!");
+      $("#publicNav").show();
+      $("#userNav").hide();
+      $location.path('/login')
     }
   })
-  .catch(function(resp) {
-    toastr.error("Oops! " + resp.data.errors.full_messages.join('<br/>'));
-  });
 });
