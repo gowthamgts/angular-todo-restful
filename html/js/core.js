@@ -1,7 +1,7 @@
 var CONSTS = {
   api: "/api",
   sessionExpiryMessage: "Your session was expired. Please login again!",
-  debugmode: true
+  debugmode: false
 }
 
 toastr.options = {
@@ -111,6 +111,11 @@ todoApp.controller('todoCtrl', function($scope, $http, $auth, $location, $rootSc
   if ($auth.retrieveData('auth_headers') == null) {
     toastr.error(CONSTS.sessionExpiryMessage);
     $location.path('/login');
+  } else {
+    $("#publicNav").hide();
+    $("#userNav").show();
+    $(".nav").find(".active").removeClass("active");
+    $("#homeNav").show().find("li").addClass("active");
   }
 
   $scope.todoLists = TodoItem.query();
