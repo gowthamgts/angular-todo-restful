@@ -94,6 +94,7 @@ todoApp.controller('signupCtrl', function($scope, $auth, $location) {
     .then(function(resp) {
       if (resp.status == 200) {
         toastr.success("Signup successful. Please login now!");
+        $location.path("/login");
       }
     })
     .catch(function(resp) {
