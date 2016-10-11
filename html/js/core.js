@@ -1,5 +1,5 @@
 var CONSTS = {
-  api: "http://localhost:3000",
+  api: "/api",
   sessionExpiryMessage: "Your session was expired. Please login again!",
   debugmode: true
 }
