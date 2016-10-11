@@ -24,12 +24,12 @@
         <div class="navbar-header">
           <a class="navbar-brand" href="#">A RESTful TODO app.</a>
         </div>
-        <ul class="nav navbar-nav">
-          <li class="active"><a href="#">Home</a></li>
+        <ul class="nav navbar-nav" id="homeNav" style="display:none">
+          <li><a href="#">Home</a></li>
         </ul>
         <ul id="publicNav" class="nav navbar-nav navbar-right">
-          <li><a href="/#/login">Login</a></li>
-          <li><a href="/#/signup">Register</a></li>
+          <li id="loginNav" class="active"><a href="/#/login">Login</a></li>
+          <li id="signupNav"><a href="/#/signup">Register</a></li>
         </ul>
         <ul id="userNav" class="nav navbar-nav navbar-right" style="display:none">
           <li><a href="/#/logout">Logout</a></li>

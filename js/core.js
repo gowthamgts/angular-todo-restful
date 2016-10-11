@@ -1,9 +1,8 @@
 var CONSTS = {
   api: "http://localhost:3000",
-  sessionExpiryMessage: "Your session was expired. Please login again!"
+  sessionExpiryMessage: "Your session was expired. Please login again!",
+  debugmode: true
 }
-
-var debugmode = true;
 
 toastr.options = {
   "closeButton": false,
@@ -58,6 +57,8 @@ angular.module('todoApp').factory('TodoItem', function($resource) {
 });
 
 todoApp.controller('loginCtrl', function($scope, $rootScope, $auth, $location){
+  $(".nav").find(".active").removeClass("active");
+  $("#loginNav").addClass("active");
   $scope.navigateToSignup = function() {
     $location.path('/signup');
   };
@@ -68,6 +69,8 @@ todoApp.controller('loginCtrl', function($scope, $rootScope, $auth, $location){
         toastr.success("Successfully logged in!");
         $("#publicNav").hide();
         $("#userNav").show();
+        $(".nav").find(".active").removeClass("active");
+        $("#homeNav").show().find("li").addClass("active");
       }
     })
     .catch(function(resp) {
@@ -81,6 +84,8 @@ todoApp.controller('loginCtrl', function($scope, $rootScope, $auth, $location){
 });
 
 todoApp.controller('signupCtrl', function($scope, $auth, $location) {
+  $(".nav").find(".active").removeClass("active");
+  $("#signupNav").addClass("active");
   $scope.navigateToLogin = function() {
     $location.path('/login');
   };
@@ -98,10 +103,10 @@ todoApp.controller('signupCtrl', function($scope, $auth, $location) {
 });
 
 todoApp.controller('todoCtrl', function($scope, $http, $auth, $location, $rootScope, $resource, TodoItem) {
-  if (debugmode) {
+  if (CONSTS.debugmode) {
     console.log($auth.retrieveData('auth_headers'));
   }
-  
+
   if ($auth.retrieveData('auth_headers') == null) {
     toastr.error(CONSTS.sessionExpiryMessage);
     $location.path('/login');
